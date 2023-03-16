@@ -10,11 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = config('DJANGO_SECRET_KEY')
+MONGO_DB_URL = config('MONGO_DB_URL')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -27,19 +31,33 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Cors settings
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDITENTIALS = True
+ALLOWED_HOSTS = ['*']
+CORS_ALLOWED_ORIGINS = ['http://*']
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:3000',
+)
+
 
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_framework',
+    'api',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'doctrin.middleware.MyMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -74,11 +92,17 @@ WSGI_APPLICATION = 'doctrin.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'default': {
+            'ENGINE': 'djongo',
+            'NAME': 'doctrin',
+            'ENFORCE_SCHEMA': False,
+            'CLIENT': {
+                    'host': MONGO_DB_URL
+
+            }
+        }
     }
-}
+    
 
 
 # Password validation
