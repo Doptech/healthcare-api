@@ -1,9 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 
-import requests
-from bs4 import BeautifulSoup
-
 def google_search(query):
     url = "https://www.google.com/search?q=" + query.replace(" ", "+")
     response = requests.get(url)

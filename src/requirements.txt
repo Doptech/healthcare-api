@@ -13,4 +13,5 @@ setuptools<58.0.0
 spacy
 layoutparser 
 pytesseract
-transformers==4.21.
+transformers==4.21.3
+openai
