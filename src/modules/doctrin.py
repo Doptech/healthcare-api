@@ -1,6 +1,6 @@
 from scrapper.openaigpt import OpenAIPrompts
 from .helperFun import PreProcessor,PostProcessor
-from ocr.report import OCR 
+from ocr.ocr_layout_parser import OCR 
 # Pre Porcessing
 
 def prepocrssor_main(data,sound=False, file_paths = None):
@@ -26,8 +26,9 @@ def prepocrssor_main(data,sound=False, file_paths = None):
     if file_paths:
         for file in file_paths:
             file_name = file.split('/')[-1]
-            data = OCR(file).extract_re_events()
-            file_data.append({file_name:data})
+            ocr_object = OCR(file)
+            text = ocr_object.extract_re_events()
+            file_data.append({file_name:text})
     
     return data,disease,file_data
 
