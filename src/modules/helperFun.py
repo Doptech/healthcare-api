@@ -33,13 +33,29 @@ class PreProcessor():
         # then we can use retriever
         return self.data
     
-    def summarization(self,ARTICLE_TO_SUMMARIZE):
-        tokenizer = AutoTokenizer.from_pretrained("ccdv/lsg-bart-base-16384-pubmed")
-        model = AutoModelForSeq2SeqLM.from_pretrained("ccdv/lsg-bart-base-16384-pubmed")
-        
-        inputs = tokenizer([ARTICLE_TO_SUMMARIZE], max_length=1024, return_tensors="pt")
+    def summarization(self,TO_SUMMARIZE):
+        tokenizer = AutoTokenizer.from_pretrained("mse30/bart-base-finetuned-pubmed")
+        model = AutoModelForSeq2SeqLM.from_pretrained("mse30/bart-base-finetuned-pubmed")
+        inputs = tokenizer([TO_SUMMARIZE], max_length=1024, return_tensors="pt")
 
         # Generate Summary
-        summary_ids = model.generate(inputs["input_ids"], num_eams=2, min_length=0, max_length=20)
-        tokenizer.batch_decode(summary_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
-        return model.generate(inputs["input_ids"], num_eams=2, min_length=0, max_length=20)
+        summary_ids = model.generate(inputs["input_ids"],min_length=0, max_length=20)
+        return tokenizer.batch_decode(summary_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
+
+def set_model_variable(user_query):
+    retrival_model = False
+    gpt_neo_model = False
+
+    # check if user query is a small talkative sentence
+    if len(user_query.split()) <= 5:
+        gpt_neo_model = True
+
+    # check if user query is of 3-4 sentences
+    elif len(user_query.split('.')) >= 3 and len(user_query.split('.')) <= 4:
+        retrival_model = True
+
+    # check if user query is not a question
+    elif '?' not in user_query:
+        gpt_neo_model = True
+
+    return {'retrival_model': retrival_model, 'gpt_neo_model': gpt_neo_model}
