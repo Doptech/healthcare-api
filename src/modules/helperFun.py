@@ -21,6 +21,10 @@ class PreProcessor():
             return result['segments']
         return result
     
+    def query(a1,a2,a3,a4,a5):
+        query = f"I am having {a1} pre-existing medical condition. {a2} medications , supplements taken. {a3} surgeries or hospitalizations done. {s4} change appetite, energy levels, or sleep patterns is observed. {a5} are the sympthoms observed "
+        return query
+
     def preprocess(self):
         # clean data using regex
         text = self.data['text']
