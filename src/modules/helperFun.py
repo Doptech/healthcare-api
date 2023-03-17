@@ -2,7 +2,12 @@ import re
 import whisper
 import spacy
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-
+from googleplaces import GooglePlaces, types, lang
+from scrapper.google import google_search
+from decouple import config
+  
+GOOLGLE_MAP_API_KEY = config('GOOLGLE_MAP_API_KEY', cast=bool)
+  
 class PreProcessor():
     
     def __init__(self, data):
@@ -29,13 +34,6 @@ class PreProcessor():
         # clean data using regex
         text = self.data['text']
         text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
-        return self.data
-
-    def queryLen_based_removal(self, query_len):
-        if len(self.data['text']) < query_len:
-            # then we can use neo gpt
-            return None
-        # then we can use retriever
         return self.data
     
     def pred_disease(text): # {'DISEASE': ['diarrhea']} ex output
@@ -64,10 +62,37 @@ class PostProcessor():
     def __init__(self, data):
         self.data = data
         
-    def postprocess(self):
-        return ""
+    def medical_data(self,meds:list):
+        res = {}
+        for med in meds:
+            text_retrived = google_search(med)
+            res[med] = text_retrived
+            
+        return res
+    
+    def get_nearby_doc(self,lat, lng, place_type):
+  
+        google_places = GooglePlaces(GOOLGLE_MAP_API_KEY)
 
-def set_model_variable(user_query):
+        # Call the nearby_search function with the given latitude, longitude, and place type
+        query_result = google_places.nearby_search(
+            lat_lng = {'lat': lat, 'lng': lng},
+            radius = 5000,
+            types = [place_type]
+        )
+
+        locations = {}
+        for place in query_result.places:
+            location_details = {
+                'name': place.name,
+                'latitude': place.geo_location['lat'],
+                'longitude': place.geo_location['lng']
+            }
+            locations[place.place_id] = location_details
+
+        return locations
+
+"""def set_model_variable(user_query):
     retrival_model = False
     gpt_neo_model = False
 
@@ -83,4 +108,4 @@ def set_model_variable(user_query):
     elif '?' not in user_query:
         gpt_neo_model = True
 
-    return {'retrival_model': retrival_model, 'gpt_neo_model': gpt_neo_model}
+    return {'retrival_model': retrival_model, 'gpt_neo_model': gpt_neo_model}"""
