@@ -55,6 +55,14 @@ class PreProcessor():
         summary_ids = model.generate(inputs["input_ids"],min_length=0, max_length=20)
         return tokenizer.batch_decode(summary_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
 
+class PostProcessor():
+    
+    def __init__(self, data):
+        self.data = data
+        
+    def postprocess(self):
+        return ""
+
 def set_model_variable(user_query):
     retrival_model = False
     gpt_neo_model = False
