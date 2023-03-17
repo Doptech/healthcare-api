@@ -3,6 +3,21 @@ from .helperFun import PreProcessor,PostProcessor
 from ocr.ocr_layout_parser import OCR 
 # Pre Porcessing
 
+def zero(text):
+    li = []
+    sequence = text
+    candidate_labels = ['disease', 'hospital', 'health', 'other']
+    classifier = pipeline("zero-shot-classification",
+                model="facebook/bart-large-mnli") 
+    di = classifier(sequence_to_classify, candidate_labels) 
+    if (di['labels'][0]) == 'other' :
+        prompt = "As a health care bot, I am programmed to discuss topics related to medical care, disease prevention, and overall wellness."
+    else:
+        prompt = "Act like a health care bot"
+
+    return {'prompt' : prompt}
+
+
 def prepocrssor_main(data,sound=False, file_paths = None):
     
     """
@@ -31,6 +46,8 @@ def prepocrssor_main(data,sound=False, file_paths = None):
             file_data.append({file_name:text})
     
     return data,disease,file_data
+
+prepocrssor_main("hi how are you",sound=False, file_paths = r"C:/Users/vrush/OneDrive/Documents/Desktop/healthcare/healthcare-api/src/media/document_sample.jpg")
 
 
 # Main'

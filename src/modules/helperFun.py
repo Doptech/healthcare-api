@@ -5,7 +5,8 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from googleplaces import GooglePlaces, types, lang
 from scrapper.google import google_search
 from decouple import config
-  
+from transformers import pipeline
+
 GOOLGLE_MAP_API_KEY = config('GOOLGLE_MAP_API_KEY', cast=bool)
   
 class PreProcessor():
@@ -29,6 +30,9 @@ class PreProcessor():
     def query(a1,a2,a3,a4,a5):
         query = f"I am having {a1} pre-existing medical condition. {a2} medications , supplements taken. {a3} surgeries or hospitalizations done. {s4} change appetite, energy levels, or sleep patterns is observed. {a5} are the sympthoms observed "
         return query
+    
+
+   
 
     def preprocess(self):
         # clean data using regex
@@ -91,6 +95,9 @@ class PostProcessor():
             locations[place.place_id] = location_details
 
         return locations
+    
+
+   
 
 """def set_model_variable(user_query):
     retrival_model = False
