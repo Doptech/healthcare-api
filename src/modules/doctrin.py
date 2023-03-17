@@ -32,7 +32,8 @@ def prepocrssor_main(data,sound=False, file_paths = None):
     return data,disease,file_data
 
 
-# Main
+# Main'
+prepocrssor_main("",sound=False, file_paths = None)
 OpenAIPromptsObject = OpenAIPrompts()
 
 # Post Processing
@@ -48,3 +49,4 @@ get_nearest_hospital = PostProcessorObject.get_nearby_doc()
 - send the answer to the user
 
 """
+
