@@ -15,3 +15,4 @@ layoutparser
 pytesseract
 transformers==4.21.3
 openai
+googleplaces
