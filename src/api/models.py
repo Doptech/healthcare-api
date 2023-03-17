@@ -60,6 +60,6 @@ class PatientUserChatMessages(models.Model):
     user_query = models.CharField(max_length=3000,default='')
     timestamp = models.DateTimeField(auto_now_add=True)
     model_answer = models.CharField(max_length=3000,default='')
-    model_score = models.FloatField()
+    #model_score = models.FloatField()
     alert = models.BooleanField(default=False)
     answer_severity = models.CharField(max_length=300,default='')

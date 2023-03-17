@@ -95,38 +95,33 @@ class DashboardAPI(APIView):
                                     "patient":main_queryset_patient_serializer.data
                                     }},status=status.HTTP_200_OK)
         else:
-            main_queryset = PatientUser.objects.filter(user_id=user_id)
-            main_queryset_serializer = PatientUserSerializer(main_queryset)
+            main_queryset = PatientUser.objects.filter(user_id=user_id).all()
+            main_queryset_serializer = PatientUserSerializer(main_queryset, many=True)
             
             # Chats of the patient
             main_queryset_patient_chats = PatientUserChats.objects.filter(user_id=user_id)
             main_queryset_patient_chats_selizer = PatientUserChatsSerializer(main_queryset_patient_chats, many=True)
             res_chats = []
             for i in range(len(main_queryset_patient_chats_selizer.data)):
-                main_queryset_patient_chats_messages = PatientUserChatMessages.objects.filter(chat_id=user_id).first()
-                main_queryset_patient_chats_messages_serlizer = PatientUserChatMessagesSerializer(main_queryset_patient_chats_messages)
+                main_queryset_patient_chats_messages = PatientUserChatMessages.objects.filter(chat_id=main_queryset_patient_chats_selizer.data[i]['chat_id']).all()
+                main_queryset_patient_chats_messages_serlizer = PatientUserChatMessagesSerializer(main_queryset_patient_chats_messages, many=True)
                 res_chats.append(main_queryset_patient_chats_messages_serlizer.data)
-                
-            main_queryset_patient_chats_messages = PatientUserChatMessages.objects.filter(chat_id=user_id)
-            main_queryset_patient_chats_messages_serlizer = PatientUserChatMessagesSerializer(main_queryset_patient_chats_messages, many=True)
-            
-            return Response({"data":{"user_data":main_queryset_serializer.data,"chat_data":main_queryset_patient_chats_messages_serlizer.data}})
+            return Response({"data":{"user_data":main_queryset_serializer.data,"chat_data":res_chats}},status=status.HTTP_200_OK)
             
         
 class PatientUserInfo(APIView):
     
     @csrf_exempt
     def get(self, request):
-        data = (JSONParser().parse(request))['data']
         main_queryset = PatientUser.objects.all()
-        main_queryset_serializer = PatientUserSerializer(main_queryset)
+        main_queryset_serializer = PatientUserSerializer(main_queryset, many=True)
         return Response({"data":main_queryset_serializer.data},status=status.HTTP_200_OK)
         
 class PatientUserInfoByID(APIView):
     
     @csrf_exempt
-    def get(self, request, patient_id):
-        main_queryset = PatientUser.objects.filter(user_id=patient_id)
+    def get(self, request, user_id):
+        main_queryset = PatientUser.objects.filter(user_id=user_id).first()
         main_queryset_serializer = PatientUserSerializer(main_queryset)
         return Response({"data":main_queryset_serializer.data},status=status.HTTP_200_OK)
     
@@ -143,19 +138,23 @@ class DoctorAlerts(APIView):
     
     @csrf_exempt
     def get(self, request):
-        main_queryset = PatientUserChatMessages.objects.filter(alert = True,timestamp__gte=datetime.datetime.now()-datetime.timedelta(days=1)).all()
-        main_queryset_data = PatientUserChatMessagesSerializer(main_queryset, many=True)
-        return Response({"data":main_queryset_data.data},status=status.HTTP_200_OK)
+        main_queryset = PatientUserChatMessages.objects.all() #,timestamp__gte=datetime.datetime.now()-datetime.timedelta(days=1)
+        main_queryset_data = PatientUserChatMessagesSerializer(main_queryset, many=True )
+        res = []
+        for i in range(len(main_queryset_data.data)):
+            if main_queryset_data.data[i]['alert'] == True:
+                res.append(main_queryset_data.data[i])
+        return Response({"data":res},status=status.HTTP_200_OK)
         
 class UserHomePage(APIView):
     
     @csrf_exempt
     def get(self, request, user_id):
         main_queryset_chats = PatientUserChats.objects.filter(user_id = user_id).all()
-        main_queryset_chats_serlizer = PatientUserChatsSerializer(main_queryset_chats)
+        main_queryset_chats_serlizer = PatientUserChatsSerializer(main_queryset_chats, many=True)
         
         main_queryset_PatientUser = PatientUser.objects.filter(user_id = user_id)
-        main_queryset_PatientUser_serlizer = PatientUserSerializer(main_queryset_PatientUser)
+        main_queryset_PatientUser_serlizer = PatientUserSerializer(main_queryset_PatientUser, many=True)
         return Response({"data":{"chat_history": main_queryset_chats_serlizer.data, 
                                  "user_info": main_queryset_PatientUser_serlizer.data}},
-                                status=status.HTTP_200_OK)
+                                status=status.HTTP_200_OK)                                                    

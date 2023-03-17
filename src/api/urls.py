@@ -14,12 +14,12 @@ urlpatterns = [
     path('doctor-user-info',DoctorAPI.as_view(), name='doctor-user-info'),
     path('docter-alerts', DoctorAlerts.as_view(), name='doctor-user-info'),
     
-    path('user-dashboard',UserHomePage.as_view(), name='user-homepage'),
+    path('user-dashboard/<user_id>',UserHomePage.as_view(), name='user-homepage'),
     path('add-files', AddFileAPI.as_view(), name='add-files'),
     
     
-    #Opem AI Cahb
-    # ots
+    #Open API's
+    
     
     
     #Socket API urls
