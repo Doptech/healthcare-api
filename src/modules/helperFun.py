@@ -1,5 +1,6 @@
 import re
 import whisper
+import spacy
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 class PreProcessor():
@@ -32,6 +33,18 @@ class PreProcessor():
             return None
         # then we can use retriever
         return self.data
+    
+    def pred_disease(text): # {'DISEASE': ['diarrhea']} ex output
+        nlp = spacy.load('en_disease_pipeline')
+        doc = nlp(text)
+        values_list = []
+        diseases_list = {}
+        for ent in nlp(doc).ents:
+            values_list.append(ent.text.strip())
+            
+        diseases_list['DISEASE'] = values_list
+        return diseases_list
+
     
     def summarization(self,TO_SUMMARIZE):
         tokenizer = AutoTokenizer.from_pretrained("mse30/bart-base-finetuned-pubmed")
