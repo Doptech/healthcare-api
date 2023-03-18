@@ -1,47 +1,45 @@
 import re
-import whisper
+#import whisper
 import spacy
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from googleplaces import GooglePlaces, types, lang
 from scrapper.google import google_search
-from decouple import config
 from transformers import pipeline
+from decouple import config
 
-GOOLGLE_MAP_API_KEY = config('GOOLGLE_MAP_API_KEY', cast=bool)
+GOOLGLE_MAP_API_KEY = config('GOOLGLE_MAP_API_KEY')
   
 class PreProcessor():
     
     def __init__(self, data):
         self.data = data
         
-    def wav_to_transcript(wav_file_path,model_name="base", segments = False):
-        model = whisper.load_model(model_name)
-        result = model.transcribe(wav_file_path)
-        if segments:
-            for segment in result['segments']:
-                segment.pop('tokens')
-                segment.pop('temperature')
-                segment.pop('avg_logprob')
-                segment.pop('compression_ratio')
-                segment.pop('no_speech_prob')
-            return result['segments']
-        return result
+    # def wav_to_transcript(wav_file_path,model_name="base", segments = False):
+    #     model = whisper.load_model(model_name)
+    #     result = model.transcribe(wav_file_path)
+    #     if segments:
+    #         for segment in result['segments']:
+    #             segment.pop('tokens')
+    #             segment.pop('temperature')
+    #             segment.pop('avg_logprob')
+    #             segment.pop('compression_ratio')
+    #             segment.pop('no_speech_prob')
+    #         return result['segments']
+    #     return result
     
     def query(a1,a2,a3,a4,a5):
         query = f"I am having {a1} pre-existing medical condition. {a2} medications , supplements taken. {a3} surgeries or hospitalizations done. {s4} change appetite, energy levels, or sleep patterns is observed. {a5} are the sympthoms observed "
         return query
-    
-
-   
 
     def preprocess(self):
         # clean data using regex
-        text = self.data['text']
+        text = self.data
         text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
         return self.data
     
-    def pred_disease(text): # {'DISEASE': ['diarrhea']} ex output
+    def pred_disease(self): # {'DISEASE': ['diarrhea']} ex output
         nlp = spacy.load('en_disease_pipeline')
+        text = self.data
         doc = nlp(text)
         values_list = []
         diseases_list = {}
@@ -96,6 +94,24 @@ class PostProcessor():
 
         return locations
     
+"""EXTRA FUNCTIONS"""
+
+def zero_shot(text):
+
+    li = []
+    sent_to_openai = True
+    sequence = text
+    candidate_labels = ['disease', 'hospital', 'health', 'other']
+    classifier = pipeline("zero-shot-classification",
+                model="facebook/bart-large-mnli")
+    di = classifier(text, candidate_labels) 
+    if (di['labels'][0]) == 'other' :
+        prompt = "As a health care bot, I am programmed to discuss topics related to medical care, disease prevention, and overall wellness."
+        sent_to_openai == False
+    else:
+        prompt = "Act like a health care bot"
+
+    return ({'prompt' : prompt}),sent_to_openai
 
    
 

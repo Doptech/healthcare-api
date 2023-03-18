@@ -1,17 +1,17 @@
 import openai 
 from decouple import config
 
-OPEN_AI_API_KEY = config('OPEN_AI_API_KEY', cast=bool)
+OPEN_AI_API_KEY = config('OPEN_AI_API_KEY')
 openai.api_key = OPEN_AI_API_KEY
 
 
 class OpenAIPrompts():
     
-    def __init__(self,prompt):
-        self.prompt = None
+    def __init__(self):
+        # self.prompt = prompt
         self.response = None
 
-    def generate_response(prompt):
+    def generate_response(sel,prompt):
         completions = openai.Completion.create(
             engine = "text-davinci-003",
             prompt = prompt,
@@ -22,7 +22,3 @@ class OpenAIPrompts():
         )
         message = completions.choices[0].text
         return message 
-
-    def get_text():
-        input_text = ("You: ","Hello, how are you?")
-        return input_text

@@ -1,7 +1,7 @@
 from scrapper.openaigpt import OpenAIPrompts
-from helperFun import PreProcessor,PostProcessor,zero_shot
+from helperFun import PreProcessor,PostProcessor
 from ocr.ocr_layout_parser import OCR 
-import re
+from transformers import pipeline
 
 def start(query,promt_no):
     preprocessor = PreProcessor(query)
@@ -12,8 +12,6 @@ def start(query,promt_no):
         next_promt,sent_to_openai = zero_shot(data)
         return next_promt, sent_to_openai
     return data,disease
-
-# start("hello my name is om and i wanted to ask about healthcare",promt_no=2)
 
 def docs_ocr(file_paths = None):
 
@@ -27,19 +25,16 @@ def docs_ocr(file_paths = None):
 
     return file_data    
 
-# print(docs_ocr(file_paths=[r'C:\Users\vrush\OneDrive\Documents\Desktop\healthcare\healthcare-api\src\media\document_sample.pdf']))
 
 def middle(query):
-    OpenAIPromptsObject = OpenAIPrompts()
-    text = OpenAIPromptsObject.generate_response(query)
+    OpenAIPromptsObject = OpenAIPrompts(query)
+    text = OpenAIPromptsObject.generate_response()
     return text
 
-#print(middle("Act like a doctor, what are best meds for high fever for a 10 year child. Medicenes should be in double qoutes"))
-
 def end(response,lat,long,type_of_doc):
-    PostProcessorObject = PostProcessor(response)
+    PostProcessorObject = PostProcessor()
 
-    meds = re.findall(r'"(.*?)"', response)
+    meds = response.split("|")
     get_nearest_hospital = PostProcessorObject.get_nearby_doc(lat,long,place_type = type_of_doc)
 
     if len(meds) > 1:
@@ -47,8 +42,21 @@ def end(response,lat,long,type_of_doc):
         return medical_data, get_nearest_hospital
     return medical_data
 
-end('"ibuprofen" and "acetaminophen". Be sure to follow the dosage instructions on the packaging and consult a doctor if the fever does not subside after taking the medications.',
-10.15,58.5,'any')
+"""EXTRA FUNCTIONS"""
+
+def zero_shot(text):
+    li = []
+    sequence = text
+    candidate_labels = ['disease', 'hospital', 'health', 'other']
+    classifier = pipeline("zero-shot-classification",
+                model="facebook/bart-large-mnli") 
+    di = classifier(text, candidate_labels) 
+    if (di['labels'][0]) == 'other' :
+        prompt = "As a health care bot, I am programmed to discuss topics related to medical care, disease prevention, and overall wellness."
+    else:
+        prompt = "Act like a health care bot"
+
+    return {'prompt' : prompt}
 
 """
     - Cleaning the data
