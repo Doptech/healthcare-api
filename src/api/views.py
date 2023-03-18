@@ -26,9 +26,14 @@ class AddFileAPI(APIView):
         file_serializer = FileSerializer(data=request.data)
         if file_serializer.is_valid():
             file_serializer.save()
+            user_id = file_serializer.data['user_id']
             pathOfFile = file_serializer.data['file']
             newPath = BASE_PATH + '/' + pathOfFile
-            
+            is_doctor = Doctor.objects.filter(docter_user_id=user_id).exists()
+            # if is_doctor:
+            #     print()
+            # else:
+            #     print()
         return Response(file_serializer.data, status=status.HTTP_201_CREATED)
     
 class OnboardingAPI(APIView): 

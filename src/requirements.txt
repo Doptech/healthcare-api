@@ -16,3 +16,10 @@ pytesseract
 transformers==4.21.3
 openai
 python-google-places
+channels==4.0.0
+channels-redis==4.0.0
+daphne==4.0.0
+psycopg2-binary==2.9.5
+python-decouple==3.6
+redis==4.3.4
+django-tailwind==3.4.0

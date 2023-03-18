@@ -19,12 +19,9 @@ urlpatterns = [
     
     
     #Open API's
-    
-    
+    path('file-upload', AddFileAPI.as_view(), name='file-upload'),
     
     #Socket API urls
-    
-    
     
     
     ]

@@ -7,6 +7,7 @@ class File(models.Model):
     file = models.FileField(blank=False, null=False)
     timestamp = models.DateTimeField(auto_now_add=True)
     file_link = models.CharField(max_length=3000,default='')
+    file_owner = models.CharField(max_length=3000,default='')
     
 class Doctor(models.Model):
     docter_user_id = models.CharField(max_length=300)
